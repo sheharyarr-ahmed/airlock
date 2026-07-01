@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 interface Props {
   disabled: boolean;
@@ -17,26 +19,22 @@ export default function QuestionBox({ disabled, busy, onAsk }: Props) {
   }
 
   return (
-    <section className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
-      <h2 className="mb-3 text-sm font-semibold text-neutral-700">2 · Ask</h2>
-      <div className="flex gap-2">
-        <input
-          type="text"
-          value={question}
-          disabled={disabled}
-          placeholder={disabled ? "Upload a document first" : "Ask a question about the document…"}
-          className="flex-1 rounded-lg border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-neutral-500 disabled:bg-neutral-50 disabled:text-neutral-400"
-          onChange={(e) => setQuestion(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && submit()}
-        />
-        <button
-          onClick={submit}
-          disabled={disabled || busy || !question.trim()}
-          className="rounded-lg bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-700 disabled:cursor-not-allowed disabled:bg-neutral-300"
-        >
-          {busy ? "…" : "Ask"}
-        </button>
-      </div>
-    </section>
+    <div className="fade-in flex items-center gap-2 rounded-full bg-card p-1.5 pl-5 ring-1 ring-foreground/10">
+      <Input
+        value={question}
+        disabled={disabled}
+        placeholder={disabled ? "Upload a document to begin…" : "Ask about the document…"}
+        onChange={(e) => setQuestion(e.target.value)}
+        onKeyDown={(e) => e.key === "Enter" && submit()}
+        className="h-9 border-0 bg-transparent px-0 shadow-none focus-visible:border-0 focus-visible:ring-0"
+      />
+      <Button
+        onClick={submit}
+        disabled={disabled || busy || !question.trim()}
+        className="accent-gradient rounded-full border-0 px-6 text-white hover:opacity-90"
+      >
+        {busy ? "…" : "Ask"}
+      </Button>
+    </div>
   );
 }

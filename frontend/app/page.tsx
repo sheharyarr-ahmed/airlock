@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "sonner";
+import Masthead from "@/components/Masthead";
 import UploadPanel from "@/components/UploadPanel";
 import QuestionBox from "@/components/QuestionBox";
 import AnswerPanel from "@/components/AnswerPanel";
@@ -12,18 +14,16 @@ export default function Home() {
   const [answer, setAnswer] = useState("");
   const [sources, setSources] = useState<Source[]>([]);
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   async function handleAsk(question: string) {
     setBusy(true);
-    setError(null);
     setAnswer("");
     setSources([]);
     await askQuestion(question, {
       onSources: setSources,
       onToken: (t) => setAnswer((prev) => prev + t),
       onError: (m) => {
-        setError(m);
+        toast.error("Could not answer", { description: m });
         setBusy(false);
       },
       onDone: () => setBusy(false),
@@ -31,18 +31,11 @@ export default function Home() {
   }
 
   return (
-    <main className="mx-auto flex max-w-2xl flex-col gap-5 px-4 py-10">
-      <header>
-        <h1 className="text-2xl font-bold tracking-tight">Airlock</h1>
-        <p className="text-sm text-neutral-500">
-          Private, fully-local PDF assistant — answers grounded in your document, with page
-          citations. Nothing leaves this machine.
-        </p>
-      </header>
-
+    <main className="mx-auto flex max-w-[680px] flex-col gap-6 px-4 py-12">
+      <Masthead />
       <UploadPanel onLoaded={setDoc} />
       <QuestionBox disabled={!doc} busy={busy} onAsk={handleAsk} />
-      <AnswerPanel answer={answer} sources={sources} busy={busy} error={error} />
+      <AnswerPanel answer={answer} sources={sources} busy={busy} />
     </main>
   );
 }

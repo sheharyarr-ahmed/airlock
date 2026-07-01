@@ -1,9 +1,130 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Airlock editorial palette (Apple News–inspired), mapped into shadcn tokens. */
 :root {
   color-scheme: light;
+  --background: #fbfaf8; /* warm paper */
+  --foreground: #1a1a1a; /* ink */
+  --card: #ffffff;
+  --card-foreground: #1a1a1a;
+  --popover: #ffffff;
+  --popover-foreground: #1a1a1a;
+  --primary: #f5375b; /* coral accent */
+  --primary-foreground: #ffffff;
+  --secondary: #f3f1ed;
+  --secondary-foreground: #1a1a1a;
+  --muted: #f3f1ed;
+  --muted-foreground: #6b6b66;
+  --accent: #fceae3; /* soft coral tint */
+  --accent-foreground: #b3122f;
+  --destructive: #dc2626;
+  --border: #eceae6; /* hairline */
+  --input: #eceae6;
+  --ring: #f5375b;
+  --radius: 0.75rem;
+
+  /* Airlock extras */
+  --accent-2: #ff6b4a; /* gradient end */
 }
 
-body {
-  background: #fafafa;
+.dark {
+  color-scheme: dark;
+  --background: #131315;
+  --foreground: #f2f2f0;
+  --card: #1c1c1f;
+  --card-foreground: #f2f2f0;
+  --popover: #1c1c1f;
+  --popover-foreground: #f2f2f0;
+  --primary: #f5375b;
+  --primary-foreground: #ffffff;
+  --secondary: #232327;
+  --secondary-foreground: #f2f2f0;
+  --muted: #232327;
+  --muted-foreground: #a0a09b;
+  --accent: #2a1e1d;
+  --accent-foreground: #ff8a72;
+  --destructive: #f04444;
+  --border: #2a2a2e;
+  --input: #2a2a2e;
+  --ring: #f5375b;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+
+  /* Fonts: reference next/font vars (not circular), with literal + system fallbacks. */
+  --font-sans: var(--font-inter), "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-newsreader), "Newsreader", ui-serif, Georgia, "Times New Roman", serif;
+  --font-heading: var(--font-newsreader), "Newsreader", ui-serif, Georgia, serif;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+}
+
+/* Coral→red brand gradient (identical in light & dark). */
+.accent-gradient {
+  background-image: linear-gradient(120deg, #f5375b 0%, #ff6b4a 100%);
+}
+.text-gradient {
+  background-image: linear-gradient(120deg, #f5375b 0%, #ff6b4a 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Streaming answer cursor + gentle entrance. */
+@keyframes airlock-blink {
+  50% {
+    opacity: 0;
+  }
+}
+.animate-cursor {
+  animation: airlock-blink 1s step-end infinite;
+}
+@keyframes airlock-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.fade-in {
+  animation: airlock-fade-in 0.4s ease-out both;
 }

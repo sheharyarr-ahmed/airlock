@@ -7,32 +7,34 @@ interface Props {
   answer: string;
   sources: Source[];
   busy: boolean;
-  error: string | null;
 }
 
-export default function AnswerPanel({ answer, sources, busy, error }: Props) {
-  const hasContent = answer || sources.length > 0 || busy || error;
-  if (!hasContent) return null;
+export default function AnswerPanel({ answer, sources, busy }: Props) {
+  if (!answer && sources.length === 0 && !busy) return null;
 
   return (
-    <section className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
-      <h2 className="mb-3 text-sm font-semibold text-neutral-700">3 · Answer</h2>
+    <section className="fade-in">
+      <h2 className="text-gradient text-xs font-semibold uppercase tracking-[0.18em]">
+        Answer
+      </h2>
 
-      {error ? (
-        <p className="text-sm text-red-600">{error}</p>
-      ) : (
-        <p className="whitespace-pre-wrap text-sm leading-relaxed text-neutral-800">
-          {answer}
-          {busy && <span className="ml-0.5 animate-pulse">▍</span>}
-        </p>
-      )}
+      <div className="mt-2 font-serif text-[1.05rem] leading-relaxed text-foreground">
+        {answer ? (
+          <>
+            {answer}
+            {busy && <span className="ml-0.5 animate-cursor">▍</span>}
+          </>
+        ) : (
+          busy && <span className="text-muted-foreground">Retrieving…</span>
+        )}
+      </div>
 
       {sources.length > 0 && (
-        <div className="mt-4">
-          <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-400">
+        <div className="mt-6">
+          <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
             Sources
           </h3>
-          <div className="flex flex-col gap-2">
+          <div className="mt-2 flex flex-col gap-2">
             {sources.map((s) => (
               <SourceCitation key={s.chunk_id} source={s} />
             ))}

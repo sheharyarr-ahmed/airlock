@@ -1,6 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "sonner";
+import { Card } from "@/components/ui/card";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import PortholeMark from "./PortholeMark";
 import { uploadPdf } from "@/lib/api";
 import type { UploadResponse } from "@/lib/types";
 
@@ -9,33 +14,47 @@ interface Props {
 }
 
 export default function UploadPanel({ onLoaded }: Props) {
-  const [status, setStatus] = useState<"idle" | "uploading" | "error">("idle");
+  const [status, setStatus] = useState<"idle" | "uploading">("idle");
   const [info, setInfo] = useState<UploadResponse | null>(null);
-  const [error, setError] = useState<string | null>(null);
 
   async function handleFile(file: File | undefined) {
     if (!file) return;
     setStatus("uploading");
-    setError(null);
     try {
       const res = await uploadPdf(file);
       setInfo(res);
-      setStatus("idle");
       onLoaded(res);
+      toast.success(`Loaded ${res.filename}`, {
+        description: `${res.pages} pages · ${res.chunks} chunks indexed.`,
+      });
     } catch (e) {
-      setStatus("error");
-      setError(e instanceof Error ? e.message : "Upload failed");
+      toast.error("Upload failed", {
+        description: e instanceof Error ? e.message : "Could not read that PDF.",
+      });
+    } finally {
+      setStatus("idle");
     }
   }
 
   return (
-    <section className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
-      <h2 className="mb-3 text-sm font-semibold text-neutral-700">1 · Document</h2>
-      <label className="flex cursor-pointer flex-col items-center gap-2 rounded-lg border-2 border-dashed border-neutral-300 px-4 py-8 text-center text-sm text-neutral-500 hover:border-neutral-400">
-        <span className="font-medium text-neutral-700">
-          {status === "uploading" ? "Processing…" : "Choose a PDF"}
+    <Card className="fade-in p-1">
+      <label className="flex cursor-pointer flex-col items-center gap-3 rounded-lg border-2 border-dashed border-border px-6 py-10 text-center transition-colors hover:border-primary/50 hover:bg-accent/40">
+        <PortholeMark className="size-12" />
+        <div>
+          <p className="font-serif text-lg font-medium text-foreground">
+            {status === "uploading"
+              ? "Reading your document…"
+              : info
+                ? "Replace document"
+                : "Upload a PDF"}
+          </p>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            Text-based PDFs only — no OCR in v1.
+          </p>
+        </div>
+        <span className={cn(buttonVariants({ variant: "outline", size: "sm" }))}>
+          {status === "uploading" ? "Processing…" : "Choose file"}
         </span>
-        <span>Text-based PDFs only (no OCR in v1)</span>
         <input
           type="file"
           accept="application/pdf"
@@ -46,12 +65,11 @@ export default function UploadPanel({ onLoaded }: Props) {
       </label>
 
       {info && (
-        <p className="mt-3 text-sm text-emerald-700">
-          Loaded <span className="font-medium">{info.filename}</span> — {info.pages} pages,{" "}
-          {info.chunks} chunks.
+        <p className="px-4 pb-1 text-center text-sm text-muted-foreground">
+          <span className="font-medium text-foreground">{info.filename}</span> ·{" "}
+          {info.pages} pages · {info.chunks} chunks
         </p>
       )}
-      {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
-    </section>
+    </Card>
   );
 }
