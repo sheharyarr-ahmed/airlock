@@ -12,6 +12,7 @@ const newsreader = Newsreader({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("http://localhost:3000"),
   title: "Airlock — Private, local PDF assistant",
   description:
     "Upload a PDF and ask questions in plain language. Answers are grounded in your document with exact page citations — and nothing ever leaves your machine.",

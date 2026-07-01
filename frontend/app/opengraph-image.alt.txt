@@ -1,0 +1,1 @@
+Airlock — private, local PDF assistant. Answers grounded in your document with page citations.

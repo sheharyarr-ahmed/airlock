@@ -1,6 +1,15 @@
-# Airlock
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="frontend/public/wordmark-light.png">
+    <img alt="Airlock" src="frontend/public/wordmark-dark.png" width="360">
+  </picture>
+</p>
 
-A **private, fully-local** document assistant. Upload a PDF, ask questions in plain language, and get answers grounded in that document with exact page citations. The entire inference path runs on your own machine via [LM Studio](https://lmstudio.ai/) — no document text, question, or answer ever leaves the device. **It works with wifi off.**
+<p align="center"><em>A private, fully-local PDF assistant — answers grounded in your document, with page citations.</em></p>
+
+---
+
+Upload a PDF, ask questions in plain language, and get answers grounded in that document with exact page citations. The entire inference path runs on your own machine via [LM Studio](https://lmstudio.ai/) — no document text, question, or answer ever leaves the device. **It works with wifi off.**
 
 ## How it works
 
