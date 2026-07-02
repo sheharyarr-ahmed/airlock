@@ -50,7 +50,13 @@ export const viewport: Viewport = {
 };
 
 // Set the theme class before first paint to avoid a flash of the wrong theme.
-const themeScript = `try{var t=localStorage.getItem('theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme:dark)').matches)){document.documentElement.classList.add('dark')}}catch(e){}`;
+// In dev builds only, ?theme=dark|light overrides so headless screenshots can
+// hit both themes deterministically; production script is unchanged.
+const devThemeOverride =
+  process.env.NODE_ENV === "development"
+    ? `var q=new URLSearchParams(location.search).get('theme');if(q==='dark'||q==='light'){t=q}`
+    : "";
+const themeScript = `try{var t=localStorage.getItem('theme');${devThemeOverride}if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme:dark)').matches)){document.documentElement.classList.add('dark')}}catch(e){}`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
