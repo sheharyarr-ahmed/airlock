@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { Inter, Newsreader } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
+import AuroraBackground from "@/components/AuroraBackground";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
 const newsreader = Newsreader({
@@ -69,6 +70,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className="antialiased">
+        <AuroraBackground />
         {children}
         <Toaster />
       </body>

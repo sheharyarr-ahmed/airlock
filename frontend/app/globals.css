@@ -4,28 +4,29 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Airlock editorial palette (Apple News–inspired), mapped into shadcn tokens. */
+/* Sealed Chamber palette mapped into shadcn tokens: background is the chamber
+   wall, cards are surfaces catching a coral rim light. */
 :root {
   color-scheme: light;
-  --background: #fbfaf8; /* warm paper */
-  --foreground: #1a1a1a; /* ink */
-  --card: #ffffff;
-  --card-foreground: #1a1a1a;
-  --popover: #ffffff;
-  --popover-foreground: #1a1a1a;
+  --background: var(--chamber-base);
+  --foreground: #17171a; /* ink */
+  --card: var(--surface-1);
+  --card-foreground: #17171a;
+  --popover: var(--surface-1);
+  --popover-foreground: #17171a;
   --primary: #f5375b; /* coral accent */
   --primary-foreground: #ffffff;
-  --secondary: #f3f1ed;
-  --secondary-foreground: #1a1a1a;
-  --muted: #f3f1ed;
-  --muted-foreground: #6b6b66;
+  --secondary: var(--surface-2);
+  --secondary-foreground: #17171a;
+  --muted: var(--surface-2);
+  --muted-foreground: #6b6b64;
   --accent: #fceae3; /* soft coral tint */
   --accent-foreground: #b3122f;
   --destructive: #dc2626;
-  --border: #eceae6; /* hairline */
-  --input: #eceae6;
+  --border: #eae7e1; /* hairline */
+  --input: #eae7e1;
   --ring: #f5375b;
-  --radius: 0.75rem;
+  --radius: 0.875rem;
 
   /* Airlock extras */
   --accent-2: #ff6b4a; /* gradient end */
@@ -33,23 +34,23 @@
 
 .dark {
   color-scheme: dark;
-  --background: #131315;
-  --foreground: #f2f2f0;
-  --card: #1c1c1f;
-  --card-foreground: #f2f2f0;
-  --popover: #1c1c1f;
-  --popover-foreground: #f2f2f0;
+  --background: var(--chamber-base);
+  --foreground: #f3f2ef;
+  --card: var(--surface-1);
+  --card-foreground: #f3f2ef;
+  --popover: var(--surface-1);
+  --popover-foreground: #f3f2ef;
   --primary: #f5375b;
   --primary-foreground: #ffffff;
-  --secondary: #232327;
-  --secondary-foreground: #f2f2f0;
-  --muted: #232327;
-  --muted-foreground: #a0a09b;
+  --secondary: var(--surface-2);
+  --secondary-foreground: #f3f2ef;
+  --muted: var(--surface-2);
+  --muted-foreground: #9a9a94;
   --accent: #2a1e1d;
   --accent-foreground: #ff8a72;
   --destructive: #f04444;
-  --border: #2a2a2e;
-  --input: #2a2a2e;
+  --border: #26262c;
+  --input: #26262c;
   --ring: #f5375b;
 }
 
@@ -155,6 +156,77 @@
   }
 }
 
+/* ===== Chamber depth layers (back→front): aurora → base → vignette → surfaces.
+   Aurora = coral light-leak drifting on the chamber wall. Transform-only motion,
+   pre-blurred gradients (blur is never animated), contained for compositing. ===== */
+.chamber-aurora {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  overflow: hidden;
+  pointer-events: none;
+  contain: strict;
+}
+.chamber-aurora::before,
+.chamber-aurora::after {
+  content: "";
+  position: absolute;
+  width: 70vmax;
+  height: 70vmax;
+  border-radius: 50%;
+  will-change: transform;
+}
+.chamber-aurora::before {
+  top: -28vmax;
+  left: -18vmax;
+  background: radial-gradient(circle, var(--aurora-a) 0%, transparent 62%);
+  animation: aurora-drift-a 34s ease-in-out infinite alternate;
+}
+.chamber-aurora::after {
+  bottom: -32vmax;
+  right: -20vmax;
+  background: radial-gradient(circle, var(--aurora-b) 0%, transparent 62%);
+  animation: aurora-drift-b 46s ease-in-out infinite alternate;
+}
+.dark .chamber-aurora {
+  mix-blend-mode: screen;
+}
+@keyframes aurora-drift-a {
+  to {
+    transform: translate3d(9vmax, 7vmax, 0) scale(1.1);
+  }
+}
+@keyframes aurora-drift-b {
+  to {
+    transform: translate3d(-8vmax, -6vmax, 0) scale(1.06);
+  }
+}
+
+.chamber-vignette {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(120% 90% at 50% 40%, transparent 55%, var(--chamber-deep) 100%);
+}
+
+/* Depth utilities */
+.elev-1 {
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 0.05),
+    0 12px 32px -16px rgb(0 0 0 / 0.1);
+}
+.dark .elev-1 {
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 0.5),
+    0 12px 32px -16px rgb(0 0 0 / 0.55);
+}
+.glow-focus {
+  box-shadow:
+    0 0 0 1px var(--coral-soft),
+    0 0 24px var(--coral-glow);
+}
+
 /* Coral→red brand gradient (identical in light & dark). */
 .accent-gradient {
   background-image: linear-gradient(120deg, #f5375b 0%, #ff6b4a 100%);
@@ -195,6 +267,11 @@
     animation: none;
   }
   .animate-cursor {
+    animation: none;
+  }
+  /* Aurora freezes in place but stays visible. */
+  .chamber-aurora::before,
+  .chamber-aurora::after {
     animation: none;
   }
 }
