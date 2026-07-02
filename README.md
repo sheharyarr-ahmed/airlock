@@ -7,6 +7,8 @@
 
 <p align="center"><em>A private, fully-local PDF assistant — answers grounded in your document, with page citations.</em></p>
 
+<p align="center"><strong><a href="https://sheharyarr-ahmed.github.io/airlock/">sheharyarr-ahmed.github.io/airlock</a></strong></p>
+
 ---
 
 Upload a PDF, ask questions in plain language, and get answers grounded in that document with exact page citations. The entire inference path runs on your own machine via [LM Studio](https://lmstudio.ai/) — no document text, question, or answer ever leaves the device. **It works with wifi off.** (One caveat: the embedding model, ~90MB, is downloaded once from Hugging Face on the first upload and cached; after that, everything runs fully offline.)
