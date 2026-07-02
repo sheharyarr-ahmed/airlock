@@ -25,13 +25,17 @@ export default function ThemeToggle() {
 
   return (
     <div className="flex items-center gap-2 text-muted-foreground">
-      <Sun className="size-4" />
+      <Sun
+        className={`size-4 transition-opacity duration-200 ${dark ? "opacity-40" : "opacity-100"}`}
+      />
       <Switch
         checked={mounted ? dark : false}
         onCheckedChange={toggle}
         aria-label="Toggle dark mode"
       />
-      <Moon className="size-4" />
+      <Moon
+        className={`size-4 transition-opacity duration-200 ${dark ? "opacity-100" : "opacity-40"}`}
+      />
     </div>
   );
 }

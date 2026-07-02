@@ -35,7 +35,7 @@ export default function AskBar({ disabled, busy, onAsk }: Props) {
       <Button
         onClick={submit}
         disabled={disabled || busy || !question.trim()}
-        className="accent-gradient rounded-full border-0 px-6 text-white transition-[transform,filter] hover:brightness-110 active:scale-[0.98]"
+        className="accent-gradient rounded-full border-0 px-6 text-white transition-[transform,filter] hover:-translate-y-px hover:brightness-110 active:translate-y-0 active:scale-[0.98]"
       >
         {busy ? "…" : "Ask"}
       </Button>

@@ -639,36 +639,24 @@
   background: var(--glass-tint);
 }
 
-/* Streaming answer cursor + gentle entrance. */
-@keyframes airlock-blink {
-  50% {
-    opacity: 0;
-  }
+/* Collapsible panels ease open/closed via base-ui's measured height var. */
+[data-slot="collapsible-content"] {
+  height: var(--collapsible-panel-height);
+  overflow: hidden;
+  transition:
+    height var(--dur-3) var(--ease-inout),
+    opacity var(--dur-3) var(--ease-inout);
 }
-.animate-cursor {
-  animation: airlock-blink 1s step-end infinite;
-}
-@keyframes airlock-fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-.fade-in {
-  animation: airlock-fade-in 0.4s ease-out both;
+[data-slot="collapsible-content"][data-starting-style],
+[data-slot="collapsible-content"][data-ending-style] {
+  height: 0;
+  opacity: 0;
 }
 
 /* ===== Reduced motion (targeted, not blanket — loading feedback stays honest) ===== */
 @media (prefers-reduced-motion: reduce) {
-  .fade-in {
-    animation: none;
-  }
-  .animate-cursor {
-    animation: none;
+  [data-slot="collapsible-content"] {
+    transition: none;
   }
   /* Aurora freezes in place but stays visible. */
   .chamber-aurora::before,

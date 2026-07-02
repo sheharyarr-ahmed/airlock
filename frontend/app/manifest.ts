@@ -8,7 +8,7 @@ export default function manifest(): MetadataRoute.Manifest {
       "Ask questions about a PDF and get answers grounded in the document, with page citations. Fully local.",
     start_url: "/",
     display: "standalone",
-    background_color: "#fbfaf8",
+    background_color: "#faf8f5",
     theme_color: "#f5375b",
     icons: [
       { src: "/icon-192.png", sizes: "192x192", type: "image/png" },
