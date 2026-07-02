@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Airlock · A private, fully local PDF assistant</title>
+<meta name="description" content="Upload a PDF, ask questions in plain language, get answers grounded in the document with exact page citations. Nothing leaves your machine. No cloud, no API keys.">
+<meta property="og:title" content="Airlock · A private, fully local PDF assistant">
+<meta property="og:description" content="Answers from your documents. Nothing leaves your machine.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://sheharyarr-ahmed.github.io/airlock/social-preview.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #000000;
+    --fg: #FFFFFF;
+    --muted: #A1A1AA;
+    --accent: #6EE7B7;
+    --line: rgba(255, 255, 255, 0.14);
+    --line-soft: rgba(255, 255, 255, 0.08);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 1.0625rem;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  ::selection { background: var(--accent); color: #000; }
+
+  .wrap {
+    max-width: 68rem;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+
+  a { color: var(--fg); text-decoration-color: rgba(255,255,255,0.35); text-underline-offset: 3px; }
+  a:hover { text-decoration-color: var(--accent); }
+
+  .skip {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    background: var(--fg);
+    color: #000;
+    padding: 0.5rem 1rem;
+  }
+  .skip:focus { left: 0; z-index: 10; }
+
+  /* Mono micro-type: labels only */
+  .label {
+    font-family: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .label b { color: var(--accent); font-weight: 400; }
+
+  /* Display type: heavy condensed, tight tracking */
+  .display {
+    font-family: "Anton", "Arial Narrow", "Helvetica Neue Condensed", sans-serif;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 0.95;
+    text-transform: uppercase;
+  }
+
+  header.site {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 1.75rem 0;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  header.site a { text-decoration: none; }
+
+  /* ---- Hero ---- */
+  .hero { padding: 5.5rem 0 4rem; }
+  .hero h1 {
+    font-size: clamp(4.5rem, 16vw, 12rem);
+    margin: 1.25rem 0 2rem;
+  }
+  .hero .promise {
+    font-size: clamp(1.35rem, 3.2vw, 2rem);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    max-width: 34ch;
+    line-height: 1.3;
+  }
+  .hero .promise em {
+    font-style: normal;
+    color: var(--accent);
+  }
+  .hero .sub {
+    color: var(--muted);
+    max-width: 62ch;
+    margin-top: 1.25rem;
+  }
+  .cta-row { margin-top: 2.25rem; display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap; }
+  .btn {
+    display: inline-block;
+    border: 1px solid var(--fg);
+    padding: 0.8rem 1.75rem;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+  .btn:hover { background: var(--fg); color: #000; }
+
+  figure.shot {
+    margin-top: 4rem;
+  }
+  figure.shot img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+  }
+  figure.shot figcaption {
+    margin-top: 0.85rem;
+    color: var(--muted);
+    font-size: 0.875rem;
+  }
+
+  /* ---- Sections ---- */
+  section { padding: 5rem 0; border-top: 1px solid var(--line-soft); }
+  section h2.display {
+    font-size: clamp(2.25rem, 6vw, 4rem);
+    margin: 0.9rem 0 2rem;
+    max-width: 18ch;
+  }
+  .prose { max-width: 62ch; color: var(--muted); }
+  .prose p + p { margin-top: 1.1rem; }
+  .prose strong { color: var(--fg); font-weight: 600; }
+
+  /* ---- Steps ---- */
+  .steps {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2.5rem;
+    margin-top: 3rem;
+  }
+  .steps .num {
+    font-family: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.8rem;
+    letter-spacing: 0.18em;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 0.9rem;
+  }
+  .steps h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin-bottom: 0.6rem;
+  }
+  .steps p { color: var(--muted); font-size: 0.98rem; }
+
+  .shot-pair {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-top: 3.5rem;
+  }
+  .shot-pair figure { margin: 0; }
+  .shot-pair img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+  }
+  .shot-pair figcaption {
+    margin-top: 0.85rem;
+    color: var(--muted);
+    font-size: 0.875rem;
+  }
+
+  /* ---- Under the hood ---- */
+  .cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3.5rem;
+    margin-top: 3rem;
+  }
+  .cols h3 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+  .cols ul { list-style: none; }
+  .cols li {
+    color: var(--muted);
+    padding: 0.85rem 0;
+    border-top: 1px solid var(--line-soft);
+    font-size: 0.98rem;
+  }
+  .cols li strong { color: var(--fg); font-weight: 600; }
+
+  /* ---- Verification ---- */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+    margin-top: 3rem;
+  }
+  .stats .n {
+    font-family: "Anton", "Arial Narrow", sans-serif;
+    font-size: clamp(3rem, 7vw, 5rem);
+    letter-spacing: -0.02em;
+    line-height: 1;
+    display: block;
+  }
+  .stats .stat-label {
+    display: block;
+    margin-top: 0.75rem;
+  }
+  .stats .total .n { color: var(--accent); }
+
+  /* ---- Scope ---- */
+  .scope-list { list-style: none; max-width: 62ch; margin-top: 2.5rem; }
+  .scope-list li {
+    padding: 0.9rem 0;
+    border-top: 1px solid var(--line-soft);
+    color: var(--muted);
+  }
+  .scope-list li strong { color: var(--fg); font-weight: 600; }
+
+  /* ---- Footer ---- */
+  footer.site {
+    border-top: 1px solid var(--line-soft);
+    padding: 3.5rem 0 4.5rem;
+  }
+  footer.site .foot-grid {
+    display: flex;
+    justify-content: space-between;
+    gap: 2rem;
+    flex-wrap: wrap;
+    align-items: baseline;
+  }
+  footer.site nav { display: flex; gap: 1.75rem; flex-wrap: wrap; }
+  footer.site nav a { color: var(--muted); font-size: 0.95rem; }
+  footer.site nav a:hover { color: var(--fg); }
+  footer.site .fine {
+    margin-top: 2rem;
+    color: var(--muted);
+    font-size: 0.875rem;
+    max-width: 62ch;
+  }
+
+  @media (max-width: 720px) {
+    .steps, .cols, .shot-pair { grid-template-columns: 1fr; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    section { padding: 3.5rem 0; }
+    .hero { padding: 3.5rem 0 3rem; }
+  }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="wrap">
+  <header class="site">
+    <span class="label">SheryLabs</span>
+    <a class="label" href="https://github.com/sheharyarr-ahmed/airlock">GitHub ↗</a>
+  </header>
+</div>
+
+<main id="main">
+
+  <div class="wrap">
+    <section class="hero" style="border-top: none;">
+      <span class="label">Private · Local · Offline</span>
+      <h1 class="display">Airlock</h1>
+      <p class="promise">Answers from your documents. <em>Nothing leaves your machine.</em></p>
+      <p class="sub">A fully local PDF assistant. Upload a PDF, ask questions in plain language, and get answers grounded in the document with exact page citations. It works with the wifi off. No cloud, no API keys, no account.</p>
+      <div class="cta-row">
+        <a class="btn" href="https://github.com/sheharyarr-ahmed/airlock">View on GitHub</a>
+        <span class="label">MIT licensed</span>
+      </div>
+      <figure class="shot">
+        <img src="screenshots/chamber-answer-dark.png" alt="The Airlock interface showing a sealed PDF, a plain-language question, a streamed answer citing page 2, and four expandable source cards ranked by relevance." width="2560" height="1800">
+        <figcaption>A grounded answer with its sources, each citation mapped to exactly one page. The sample document is a fictional generated PDF.</figcaption>
+      </figure>
+    </section>
+
+    <section id="problem">
+      <span class="label">The problem</span>
+      <h2 class="display">Some documents can never go to the cloud</h2>
+      <div class="prose">
+        <p>Legal contracts, medical records, financial statements, HR files. For many of these, sending the contents to a third-party AI service is not a policy preference, it is a legal boundary. The usual conclusion is that these documents simply do not get AI assistance.</p>
+        <p>Airlock removes that constraint by moving the model instead of the document. The entire pipeline, from text extraction through embedding, retrieval, and generation, runs on the machine where the file already lives. <strong>If the document cannot leave the building, the model comes to it.</strong></p>
+      </div>
+    </section>
+
+    <section id="how">
+      <span class="label">How it works</span>
+      <h2 class="display">Seal it. Ask it. Cite it.</h2>
+      <ol class="steps">
+        <li>
+          <span class="num">01</span>
+          <h3>Seal the document</h3>
+          <p>Drop a PDF onto the hatch. Airlock extracts every page, chunks the text page by page, and embeds it locally. The chamber seals; from here the document is indexed and ready.</p>
+        </li>
+        <li>
+          <span class="num">02</span>
+          <h3>Ask in plain language</h3>
+          <p>No query syntax, no prompt engineering. Type the question the way you would ask a colleague who had read the document.</p>
+        </li>
+        <li>
+          <span class="num">03</span>
+          <h3>Get a cited answer</h3>
+          <p>The answer streams in token by token with the exact page cited. Every source expands to the passage it came from. If the answer is not in the document, Airlock says so plainly.</p>
+        </li>
+      </ol>
+      <div class="shot-pair">
+        <figure>
+          <img src="screenshots/chamber-empty-dark.png" alt="The empty sealed-chamber interface: a machined porthole hatch as the drop zone, with the line Ask your document anything, nothing leaves this machine." width="1280" height="900">
+          <figcaption>The hatch is the drop zone. One document, sealed in.</figcaption>
+        </figure>
+        <figure>
+          <img src="screenshots/chamber-answer-light.png" alt="The same interface in light theme, showing a question about vacation days answered with a page 2 citation and expandable sources." width="2560" height="1800">
+          <figcaption>Full light theme included, with the seal intact either way.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section id="hood">
+      <span class="label">Under the hood</span>
+      <h2 class="display">The whole pipeline, on your hardware</h2>
+      <div class="cols">
+        <div>
+          <h3>Backend</h3>
+          <ul>
+            <li><strong>FastAPI + Pydantic v2</strong> owning the full RAG pipeline, end to end.</li>
+            <li><strong>Per-page extraction and page-scoped chunking.</strong> Chunks never span pages, so every citation maps to exactly one page, unambiguously.</li>
+            <li><strong>In-process embeddings</strong> on the CPU. No embedding service to run alongside the chat model.</li>
+            <li><strong>NumPy cosine retrieval.</strong> Hundreds of chunks need no vector database.</li>
+            <li><strong>SSE token streaming</strong> from a local llama-3.2-3b served by LM Studio. The model sees only the retrieved chunks, never the full document.</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Frontend</h3>
+          <ul>
+            <li><strong>Next.js 15, React 19, TypeScript strict.</strong> Typed contracts on every boundary between UI and API.</li>
+            <li><strong>The sealed chamber is pure CSS.</strong> GPU-composited transform and opacity only, zero animation libraries.</li>
+            <li><strong>136 kB First Load JS.</strong> The interface stays light because the work happens in the backend.</li>
+            <li><strong>Full reduced-motion support</strong> that keeps loading feedback honest, not just switched off.</li>
+            <li><strong>Screen-reader support.</strong> Streamed answers announce calmly; state is never carried by color or motion alone.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="verification">
+      <span class="label">Verification</span>
+      <h2 class="display">Tested against the real model, not a mock</h2>
+      <div class="prose">
+        <p>The end-to-end suite drives the real UI against the real local model: upload, seal, streamed answer, expandable citations, error paths, theme persistence, and the reduced-motion flow.</p>
+      </div>
+      <div class="stats">
+        <div>
+          <span class="n">12</span>
+          <span class="label stat-label">Backend unit tests</span>
+        </div>
+        <div>
+          <span class="n">19</span>
+          <span class="label stat-label">Playwright checks</span>
+        </div>
+        <div>
+          <span class="n">7</span>
+          <span class="label stat-label">Failure-mode regressions</span>
+        </div>
+        <div class="total">
+          <span class="n">26</span>
+          <span class="label stat-label">Automated e2e checks</span>
+        </div>
+      </div>
+      <div class="prose" style="margin-top: 2.5rem;">
+        <p>The failure-mode regressions cover the ugly cases: the backend dying mid-stream, truncated SSE streams, replacing the document while an answer is streaming. The UI always settles. It never sticks.</p>
+      </div>
+    </section>
+
+    <section id="scope">
+      <span class="label">Scope, stated plainly</span>
+      <h2 class="display">What v1 is, and is not</h2>
+      <ul class="scope-list">
+        <li><strong>Single user, single machine, single document</strong> at a time. It is a local tool, not a service.</li>
+        <li><strong>Text PDFs only.</strong> No OCR, so scanned documents are out of scope for now.</li>
+        <li><strong>No auth.</strong> There is nothing to log into because there is no server beyond your own.</li>
+        <li><strong>One offline caveat:</strong> the first upload triggers a one-time download of a ~90MB embedding model. Everything after that runs with the wifi off.</li>
+        <li><strong>The sample document</strong> shown in the screenshots is a fictional, generated PDF.</li>
+      </ul>
+    </section>
+  </div>
+
+</main>
+
+<div class="wrap">
+  <footer class="site">
+    <div class="foot-grid">
+      <span class="label">Airlock · MIT License</span>
+      <nav aria-label="Footer">
+        <a href="https://github.com/sheharyarr-ahmed/airlock">GitHub</a>
+        <a href="https://sherylabs.com">sherylabs.com</a>
+        <a href="https://cal.com/sheharyar-ahmed">Book a call</a>
+      </nav>
+    </div>
+    <p class="fine">Built by Sheharyar Ahmed at SheryLabs. Sole author, every layer: backend, frontend, interface design, and the test suite.</p>
+  </footer>
+</div>
+
+</body>
+</html>
