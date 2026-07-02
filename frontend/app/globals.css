@@ -519,49 +519,142 @@
   backdrop-filter: blur(14px) saturate(1.15);
 }
 
-/* Engine status beacon */
-.beacon-dot {
-  position: relative;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
+/* Engine status beacon — the "Torque Collar", a working miniature of the
+   hero hatch. Mechanical grammar: continuous rotation = running, indexed
+   ratcheting = working on it, slipped-and-shuddering = fault. Rotation and
+   opacity are the only animated properties. */
+:root {
+  --beacon-online: #0e9f6e;
+}
+.dark {
+  --beacon-online: #3ecf8e;
+}
+.beacon-mark {
+  display: block;
   flex-shrink: 0;
 }
-.beacon-dot::after {
-  content: "";
-  position: absolute;
-  inset: -5px;
-  border-radius: 50%;
+.beacon-mark .beacon-collar {
+  stroke: var(--muted-foreground);
+  opacity: 0.5;
+}
+.beacon-mark .beacon-bolt {
+  fill: var(--muted-foreground);
+  opacity: 0.85;
+}
+.beacon-mark .beacon-bolts {
+  /* transform-box is load-bearing: without it Safari rotates the group
+     around the SVG's top-left corner instead of its center. */
+  transform-box: view-box;
+  transform-origin: 50% 50%;
+}
+.beacon-mark .beacon-glow,
+.beacon-mark .beacon-slash {
   opacity: 0;
 }
-.beacon-online {
-  background: #10b981;
+
+/* ONLINE — sealed and running: watch-movement idle, 1 rev/min. */
+.beacon--online .beacon-glass {
+  fill: var(--beacon-online);
 }
-.beacon-online::after {
-  background: radial-gradient(circle, rgb(16 185 129 / 0.55), transparent 70%);
-  animation: beacon-pulse 2.4s var(--ease-inout) infinite;
+.beacon--online .beacon-glow {
+  fill: var(--beacon-online);
+  opacity: 0.16;
 }
-.beacon-offline {
-  background: var(--destructive);
+.beacon--online .beacon-bolts {
+  animation: beacon-idle 60s linear infinite;
 }
-.beacon-offline::after {
-  background: radial-gradient(circle, rgb(220 38 38 / 0.5), transparent 70%);
-  opacity: 0.8;
+@keyframes beacon-idle {
+  to {
+    transform: rotate(360deg);
+  }
 }
-.beacon-checking {
-  background: var(--muted-foreground);
+
+/* CHECKING — not yet sealed: hollow glass, ring ratchets bolt-to-bolt.
+   Identical adjacent keyframes = dwell; each 60° snap takes ~0.24s with a
+   spring overshoot (torque-wrench indexing). */
+.beacon--checking .beacon-glass {
+  fill: none;
+  stroke: var(--muted-foreground);
 }
-.beacon-checking::after {
-  background: radial-gradient(circle, rgb(128 128 128 / 0.4), transparent 70%);
-  animation: beacon-pulse 1.2s var(--ease-inout) infinite;
+.beacon--checking .beacon-bolts {
+  animation: beacon-ratchet 5.4s cubic-bezier(0.3, 1.35, 0.45, 1) infinite;
 }
-@keyframes beacon-pulse {
-  0%,
-  100% {
-    opacity: 0.25;
+@keyframes beacon-ratchet {
+  0% {
+    transform: rotate(0deg);
+  }
+  4.5% {
+    transform: rotate(60deg);
+  }
+  16.66% {
+    transform: rotate(60deg);
+  }
+  21.16% {
+    transform: rotate(120deg);
+  }
+  33.33% {
+    transform: rotate(120deg);
+  }
+  37.83% {
+    transform: rotate(180deg);
   }
   50% {
-    opacity: 1;
+    transform: rotate(180deg);
+  }
+  54.5% {
+    transform: rotate(240deg);
+  }
+  66.66% {
+    transform: rotate(240deg);
+  }
+  71.16% {
+    transform: rotate(300deg);
+  }
+  83.33% {
+    transform: rotate(300deg);
+  }
+  87.83% {
+    transform: rotate(360deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* OFFLINE — the seal slipped: ring frozen off-index, bottom bolt ejected,
+   glass slashed. A brief shudder every 4s — a mechanism failing to catch. */
+.beacon--offline .beacon-glass {
+  fill: var(--destructive);
+}
+.beacon--offline .beacon-glow {
+  fill: var(--destructive);
+  opacity: 0.18;
+}
+.beacon--offline .beacon-slash {
+  stroke: var(--background);
+  opacity: 1;
+}
+.beacon--offline .beacon-bolt-eject {
+  opacity: 0;
+}
+.beacon--offline .beacon-bolts {
+  transform: rotate(-30deg);
+  animation: beacon-slip 4s ease-in-out infinite;
+}
+@keyframes beacon-slip {
+  0%,
+  88%,
+  100% {
+    transform: rotate(-30deg);
+  }
+  91% {
+    transform: rotate(-25deg);
+  }
+  94% {
+    transform: rotate(-33deg);
+  }
+  97% {
+    transform: rotate(-29deg);
   }
 }
 
@@ -805,11 +898,14 @@
   [data-querying="true"] .dock-pulse {
     opacity: 0.6;
   }
-  /* Beacon holds a steady state color; theme icons swap instantly. */
-  .beacon-online::after,
-  .beacon-checking::after {
+  /* Beacon freezes into distinct mechanical poses: online = bolts on-index
+     with solid glass, checking = mid-turn with hollow glass, offline stays
+     slipped with the ejected bolt + slash. Shape carries the state. */
+  .beacon-mark .beacon-bolts {
     animation: none;
-    opacity: 0.6;
+  }
+  .beacon--checking .beacon-bolts {
+    transform: rotate(30deg);
   }
   .theme-icon {
     transition: none;
