@@ -1,19 +1,19 @@
 "use client";
 
+// One-button theme toggle: sun and moon cross-fade/rotate via the .dark class
+// (CSS-driven, so SSR markup never mismatches).
 import { useEffect, useState } from "react";
 import { Sun, Moon } from "lucide-react";
-import { Switch } from "@/components/ui/switch";
 
 export default function ThemeToggle() {
   const [dark, setDark] = useState(false);
-  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
     setDark(document.documentElement.classList.contains("dark"));
   }, []);
 
-  function toggle(next: boolean) {
+  function toggle() {
+    const next = !dark;
     setDark(next);
     document.documentElement.classList.toggle("dark", next);
     try {
@@ -24,18 +24,14 @@ export default function ThemeToggle() {
   }
 
   return (
-    <div className="flex items-center gap-2 text-muted-foreground">
-      <Sun
-        className={`size-4 transition-opacity duration-200 ${dark ? "opacity-40" : "opacity-100"}`}
-      />
-      <Switch
-        checked={mounted ? dark : false}
-        onCheckedChange={toggle}
-        aria-label="Toggle dark mode"
-      />
-      <Moon
-        className={`size-4 transition-opacity duration-200 ${dark ? "opacity-100" : "opacity-40"}`}
-      />
-    </div>
+    <button
+      type="button"
+      onClick={toggle}
+      aria-label={dark ? "Switch to light theme" : "Switch to dark theme"}
+      className="theme-btn"
+    >
+      <Sun className="theme-icon theme-icon-sun" />
+      <Moon className="theme-icon theme-icon-moon" />
+    </button>
   );
 }

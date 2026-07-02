@@ -508,6 +508,116 @@
   }
 }
 
+/* ===== Masthead app bar: frosted glass over the chamber, hairline edge. ===== */
+.masthead-bar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  border-bottom: 1px solid var(--border);
+  background: color-mix(in srgb, var(--chamber-base) 82%, transparent);
+  -webkit-backdrop-filter: blur(14px) saturate(1.15);
+  backdrop-filter: blur(14px) saturate(1.15);
+}
+
+/* Engine status beacon */
+.beacon-dot {
+  position: relative;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.beacon-dot::after {
+  content: "";
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+  opacity: 0;
+}
+.beacon-online {
+  background: #10b981;
+}
+.beacon-online::after {
+  background: radial-gradient(circle, rgb(16 185 129 / 0.55), transparent 70%);
+  animation: beacon-pulse 2.4s var(--ease-inout) infinite;
+}
+.beacon-offline {
+  background: var(--destructive);
+}
+.beacon-offline::after {
+  background: radial-gradient(circle, rgb(220 38 38 / 0.5), transparent 70%);
+  opacity: 0.8;
+}
+.beacon-checking {
+  background: var(--muted-foreground);
+}
+.beacon-checking::after {
+  background: radial-gradient(circle, rgb(128 128 128 / 0.4), transparent 70%);
+  animation: beacon-pulse 1.2s var(--ease-inout) infinite;
+}
+@keyframes beacon-pulse {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Theme toggle: single button, sun/moon rotate + cross-fade via .dark. */
+.theme-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 9999px;
+  color: var(--muted-foreground);
+  transition:
+    background-color var(--dur-2) var(--ease-decel),
+    color var(--dur-2) var(--ease-decel),
+    transform var(--dur-1) var(--ease-decel);
+}
+.theme-btn:hover {
+  background: var(--secondary);
+  color: var(--foreground);
+}
+.theme-btn:active {
+  transform: scale(0.92);
+}
+.theme-btn:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--background),
+    0 0 0 4px var(--ring);
+}
+.theme-icon {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  transition:
+    opacity var(--dur-3) var(--ease-decel),
+    transform var(--dur-3) var(--ease-decel);
+}
+.theme-icon-sun {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+}
+.dark .theme-icon-sun {
+  opacity: 0;
+  transform: rotate(90deg) scale(0.4);
+}
+.theme-icon-moon {
+  opacity: 0;
+  transform: rotate(-90deg) scale(0.4);
+}
+.dark .theme-icon-moon {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+}
+
 /* Ask bar: focus pulls a coral ring glow out of the chamber wall. */
 .askbar {
   transition:
@@ -694,5 +804,14 @@
   }
   [data-querying="true"] .dock-pulse {
     opacity: 0.6;
+  }
+  /* Beacon holds a steady state color; theme icons swap instantly. */
+  .beacon-online::after,
+  .beacon-checking::after {
+    animation: none;
+    opacity: 0.6;
+  }
+  .theme-icon {
+    transition: none;
   }
 }

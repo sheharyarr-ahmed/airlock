@@ -48,35 +48,37 @@ export default function Home() {
   const onFile = (f: File | undefined) => f && chamber.seal(f);
 
   return (
-    <main
-      data-phase={chamber.phase}
-      className="mx-auto flex min-h-dvh w-full max-w-[720px] flex-col px-[clamp(20px,5vw,32px)]"
-    >
+    <div className="flex min-h-dvh flex-col">
       <Masthead />
 
-      {!docked || !chamber.doc ? (
-        <ChamberHero phase={chamber.phase} onFile={onFile} hatchRef={hatchRef} />
-      ) : (
-        <div className="flex flex-col gap-5 pb-16 pt-2">
-          <DocSeal
-            doc={chamber.doc}
-            querying={chamber.busy}
-            sealing={chamber.phase === "sealing"}
-            dockFrom={dockFrom}
-            onFile={onFile}
-          />
-          <AskBar
-            disabled={chamber.phase === "sealing"}
-            busy={chamber.busy}
-            onAsk={chamber.ask}
-          />
-          <AnswerStream
-            tokens={chamber.tokens}
-            sources={chamber.sources}
-            busy={chamber.busy}
-          />
-        </div>
-      )}
-    </main>
+      <main
+        data-phase={chamber.phase}
+        className="mx-auto flex w-full max-w-[720px] flex-1 flex-col px-[clamp(20px,5vw,32px)]"
+      >
+        {!docked || !chamber.doc ? (
+          <ChamberHero phase={chamber.phase} onFile={onFile} hatchRef={hatchRef} />
+        ) : (
+          <div className="flex flex-col gap-5 pb-16 pt-8">
+            <DocSeal
+              doc={chamber.doc}
+              querying={chamber.busy}
+              sealing={chamber.phase === "sealing"}
+              dockFrom={dockFrom}
+              onFile={onFile}
+            />
+            <AskBar
+              disabled={chamber.phase === "sealing"}
+              busy={chamber.busy}
+              onAsk={chamber.ask}
+            />
+            <AnswerStream
+              tokens={chamber.tokens}
+              sources={chamber.sources}
+              busy={chamber.busy}
+            />
+          </div>
+        )}
+      </main>
+    </div>
   );
 }
