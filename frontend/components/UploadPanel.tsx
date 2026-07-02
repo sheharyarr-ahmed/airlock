@@ -1,40 +1,21 @@
 "use client";
 
-import { useState } from "react";
-import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import PortholeMark from "./PortholeMark";
-import { uploadPdf } from "@/lib/api";
+import type { ChamberPhase } from "@/lib/useChamber";
 import type { UploadResponse } from "@/lib/types";
 
 interface Props {
-  onLoaded: (info: UploadResponse) => void;
+  phase: ChamberPhase;
+  doc: UploadResponse | null;
+  onFile: (file: File | undefined) => void;
 }
 
-export default function UploadPanel({ onLoaded }: Props) {
-  const [status, setStatus] = useState<"idle" | "uploading">("idle");
-  const [info, setInfo] = useState<UploadResponse | null>(null);
-
-  async function handleFile(file: File | undefined) {
-    if (!file) return;
-    setStatus("uploading");
-    try {
-      const res = await uploadPdf(file);
-      setInfo(res);
-      onLoaded(res);
-      toast.success(`Loaded ${res.filename}`, {
-        description: `${res.pages} pages · ${res.chunks} chunks indexed.`,
-      });
-    } catch (e) {
-      toast.error("Upload failed", {
-        description: e instanceof Error ? e.message : "Could not read that PDF.",
-      });
-    } finally {
-      setStatus("idle");
-    }
-  }
+// Presentational: upload orchestration lives in useChamber.
+export default function UploadPanel({ phase, doc, onFile }: Props) {
+  const uploading = phase === "sealing";
 
   return (
     <Card className="fade-in p-1">
@@ -42,32 +23,28 @@ export default function UploadPanel({ onLoaded }: Props) {
         <PortholeMark className="size-12" />
         <div>
           <p className="font-serif text-lg font-medium text-foreground">
-            {status === "uploading"
-              ? "Reading your document…"
-              : info
-                ? "Replace document"
-                : "Upload a PDF"}
+            {uploading ? "Reading your document…" : doc ? "Replace document" : "Upload a PDF"}
           </p>
           <p className="mt-0.5 text-xs text-muted-foreground">
             Text-based PDFs only — no OCR in v1.
           </p>
         </div>
         <span className={cn(buttonVariants({ variant: "outline", size: "sm" }))}>
-          {status === "uploading" ? "Processing…" : "Choose file"}
+          {uploading ? "Processing…" : "Choose file"}
         </span>
         <input
           type="file"
           accept="application/pdf"
           className="hidden"
-          disabled={status === "uploading"}
-          onChange={(e) => handleFile(e.target.files?.[0])}
+          disabled={uploading}
+          onChange={(e) => onFile(e.target.files?.[0])}
         />
       </label>
 
-      {info && (
+      {doc && (
         <p className="px-4 pb-1 text-center text-sm text-muted-foreground">
-          <span className="font-medium text-foreground">{info.filename}</span> ·{" "}
-          {info.pages} pages · {info.chunks} chunks
+          <span className="font-medium text-foreground">{doc.filename}</span> ·{" "}
+          {doc.pages} pages · {doc.chunks} chunks
         </p>
       )}
     </Card>
