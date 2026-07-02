@@ -1,28 +1,18 @@
-import PortholeMark from "./PortholeMark";
+import Porthole from "./Porthole";
 import ThemeToggle from "./ThemeToggle";
 
+// Chrome-only masthead: wordmark on the column axis, theme toggle is the one
+// right-aligned element on the page.
 export default function Masthead() {
   return (
-    <header className="fade-in">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <PortholeMark className="size-10" />
-          <span className="font-serif text-3xl font-semibold tracking-tight text-foreground">
-            Airlock
-          </span>
-        </div>
-        <ThemeToggle />
+    <header className="reveal-up flex items-center justify-between pb-4 pt-6">
+      <div className="flex items-center gap-2.5">
+        <Porthole className="size-7" />
+        <span className="font-serif text-[22px] font-semibold tracking-tight text-foreground">
+          Airlock
+        </span>
       </div>
-
-      <div className="mt-4 h-px w-full bg-border" />
-
-      <p className="text-gradient mt-3 inline-block text-xs font-semibold uppercase tracking-[0.18em]">
-        Private · Local · Offline
-      </p>
-      <p className="mt-1 max-w-prose text-sm leading-relaxed text-muted-foreground">
-        A private PDF assistant. Ask questions in plain language and get answers grounded
-        in your document, with exact page citations. Nothing ever leaves this machine.
-      </p>
+      <ThemeToggle />
     </header>
   );
 }
