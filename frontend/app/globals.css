@@ -508,6 +508,19 @@
   }
 }
 
+/* Ask bar: focus pulls a coral ring glow out of the chamber wall. */
+.askbar {
+  transition:
+    box-shadow var(--dur-2) var(--ease-decel),
+    border-color var(--dur-2) var(--ease-decel);
+}
+.askbar:focus-within {
+  border-color: color-mix(in srgb, var(--primary) 45%, var(--border));
+  box-shadow:
+    0 0 0 1px var(--coral-soft),
+    0 0 24px var(--coral-glow);
+}
+
 /* Docked hatch: low-amplitude pulse while a question streams. */
 .dock-pulse {
   position: absolute;

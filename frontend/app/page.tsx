@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Masthead from "@/components/Masthead";
 import ChamberHero from "@/components/ChamberHero";
 import DocSeal from "@/components/DocSeal";
-import QuestionBox from "@/components/QuestionBox";
+import AskBar from "@/components/AskBar";
 import AnswerPanel from "@/components/AnswerPanel";
 import { useChamber } from "@/lib/useChamber";
 
@@ -65,7 +65,7 @@ export default function Home() {
             dockFrom={dockFrom}
             onFile={onFile}
           />
-          <QuestionBox
+          <AskBar
             disabled={chamber.phase === "sealing"}
             busy={chamber.busy}
             onAsk={chamber.ask}
