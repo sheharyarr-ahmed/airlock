@@ -5,7 +5,7 @@ import Masthead from "@/components/Masthead";
 import ChamberHero from "@/components/ChamberHero";
 import DocSeal from "@/components/DocSeal";
 import AskBar from "@/components/AskBar";
-import AnswerPanel from "@/components/AnswerPanel";
+import AnswerStream from "@/components/AnswerStream";
 import { useChamber } from "@/lib/useChamber";
 
 // After a live seal, hold the hero long enough for the seal one-shot to land
@@ -70,8 +70,8 @@ export default function Home() {
             busy={chamber.busy}
             onAsk={chamber.ask}
           />
-          <AnswerPanel
-            answer={chamber.tokens.join("")}
+          <AnswerStream
+            tokens={chamber.tokens}
             sources={chamber.sources}
             busy={chamber.busy}
           />
