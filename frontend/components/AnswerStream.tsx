@@ -24,10 +24,13 @@ export default function AnswerStream({ tokens, sources, busy }: Props) {
         <span className="answer-rule h-[2px] flex-1 rounded-full" aria-hidden="true" />
       </h2>
 
-      <div
-        aria-live="polite"
-        className="mt-4 max-w-[64ch] font-serif text-[19px] leading-[1.72] text-foreground"
-      >
+      {/* Screen readers get two calm announcements (started / full answer)
+          instead of a live region that mutates on every streamed token. */}
+      <div role="status" className="sr-only">
+        {busy ? "Answering from the sealed document…" : tokens.join("")}
+      </div>
+
+      <div className="mt-4 max-w-[64ch] font-serif text-[19px] leading-[1.72] text-foreground">
         {tokens.length > 0 ? (
           <>
             {tokens.map((t, i) => (

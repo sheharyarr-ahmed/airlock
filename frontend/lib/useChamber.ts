@@ -3,7 +3,7 @@
 // The chamber state machine — the only orchestration layer in the app.
 // Owns the UI phase and streamed answer state; calls the unchanged lib/api.ts
 // client and translates its callbacks into reducer transitions.
-import { useCallback, useEffect, useReducer } from "react";
+import { useCallback, useEffect, useReducer, useRef } from "react";
 import { toast } from "sonner";
 import { askQuestion, uploadPdf } from "./api";
 import { getMockState, MOCK_ANSWER, MOCK_DOC, MOCK_SOURCES } from "./devMock";
@@ -71,6 +71,10 @@ function mockState(): ChamberState | null {
 
 export function useChamber() {
   const [state, dispatch] = useReducer(reducer, INITIAL);
+  // Generation fence: bumped by every seal() and ask(). Callbacks from a
+  // stale stream (e.g. Replace clicked while an answer was in flight) are
+  // dropped so an old document's tokens can never render under a new seal.
+  const genRef = useRef(0);
 
   useEffect(() => {
     const seeded = mockState();
@@ -78,6 +82,7 @@ export function useChamber() {
   }, []);
 
   const seal = useCallback(async (file: File) => {
+    genRef.current += 1;
     dispatch({ type: "SEAL_START" });
     try {
       const doc = await uploadPdf(file);
@@ -94,16 +99,30 @@ export function useChamber() {
   }, []);
 
   const ask = useCallback(async (question: string) => {
+    const gen = ++genRef.current;
+    const live = () => genRef.current === gen;
     dispatch({ type: "ASK_START" });
-    await askQuestion(question, {
-      onSources: (sources) => dispatch({ type: "SOURCES", sources }),
-      onToken: (text) => dispatch({ type: "TOKEN", text }),
-      onError: (message) => {
-        toast.error("Could not answer", { description: message });
-        dispatch({ type: "ASK_SETTLED" });
-      },
-      onDone: () => dispatch({ type: "ASK_SETTLED" }),
-    });
+    try {
+      await askQuestion(question, {
+        onSources: (sources) => live() && dispatch({ type: "SOURCES", sources }),
+        onToken: (text) => live() && dispatch({ type: "TOKEN", text }),
+        onError: (message) => {
+          if (live()) toast.error("Could not answer", { description: message });
+        },
+        onDone: () => {},
+      });
+    } catch (e) {
+      // Network-level failure (backend down, connection dropped mid-stream).
+      if (live()) {
+        toast.error("Could not answer", {
+          description: e instanceof Error ? e.message : "Connection to the local engine was lost.",
+        });
+      }
+    } finally {
+      // The single guaranteed terminal transition — the UI can never be
+      // left stuck in "answering" regardless of how the stream ended.
+      if (live()) dispatch({ type: "ASK_SETTLED" });
+    }
   }, []);
 
   return { ...state, busy: state.phase === "answering", seal, ask };

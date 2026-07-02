@@ -29,7 +29,11 @@ export default function AskBar({ disabled, busy, onAsk }: Props) {
         autoFocus
         placeholder={disabled ? "Sealing…" : "Ask about the document…"}
         onChange={(e) => setQuestion(e.target.value)}
-        onKeyDown={(e) => e.key === "Enter" && submit()}
+        onKeyDown={(e) => {
+          // isComposing guard: don't submit the Enter that commits an IME
+          // (CJK) composition.
+          if (e.key === "Enter" && !e.nativeEvent.isComposing) submit();
+        }}
         className="h-9 border-0 bg-transparent px-0 shadow-none focus-visible:border-0 focus-visible:ring-0"
       />
       <Button

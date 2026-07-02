@@ -39,13 +39,19 @@ export default function DocSeal({ doc, querying, sealing, dockFrom, onFile }: Pr
         {doc.pages}p · {doc.chunks} chunks
       </span>
 
-      <label className="shrink-0 cursor-pointer rounded-full px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">
+      <label
+        className={
+          sealing || querying
+            ? "shrink-0 cursor-default rounded-full px-3 py-1.5 text-xs font-medium text-muted-foreground/50"
+            : "shrink-0 cursor-pointer rounded-full px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground has-[input:focus-visible]:ring-2 has-[input:focus-visible]:ring-ring has-[input:focus-visible]:ring-offset-2 has-[input:focus-visible]:ring-offset-background"
+        }
+      >
         {sealing ? "Sealing…" : "Replace"}
         <input
           type="file"
           accept="application/pdf"
           className="sr-only"
-          disabled={sealing}
+          disabled={sealing || querying}
           onChange={(e) => {
             onFile(e.target.files?.[0]);
             e.target.value = "";

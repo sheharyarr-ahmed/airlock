@@ -37,7 +37,22 @@ export interface AskHandlers {
 
 // Consume the POST /ask SSE stream. EventSource can't POST, so we parse the
 // `event:`/`data:` frames out of the fetch ReadableStream ourselves.
+// Guarantees a terminal callback: if the stream closes without a `done` or
+// `error` frame (e.g. the server died mid-answer), onError fires.
 export async function askQuestion(question: string, handlers: AskHandlers): Promise<void> {
+  let terminal = false;
+  const tracked: AskHandlers = {
+    ...handlers,
+    onError: (m) => {
+      terminal = true;
+      handlers.onError(m);
+    },
+    onDone: () => {
+      terminal = true;
+      handlers.onDone();
+    },
+  };
+
   const res = await fetch(`${API_BASE}/ask`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -45,7 +60,7 @@ export async function askQuestion(question: string, handlers: AskHandlers): Prom
   });
 
   if (!res.ok || !res.body) {
-    handlers.onError(`ask failed (${res.status})`);
+    tracked.onError(`ask failed (${res.status})`);
     return;
   }
 
@@ -63,9 +78,11 @@ export async function askQuestion(question: string, handlers: AskHandlers): Prom
     while ((sep = buffer.indexOf("\n\n")) !== -1) {
       const frame = buffer.slice(0, sep);
       buffer = buffer.slice(sep + 2);
-      dispatchFrame(frame, handlers);
+      dispatchFrame(frame, tracked);
     }
   }
+
+  if (!terminal) tracked.onError("The answer stream ended unexpectedly.");
 }
 
 function dispatchFrame(frame: string, handlers: AskHandlers): void {
